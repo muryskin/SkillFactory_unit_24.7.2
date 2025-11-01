@@ -1,5 +1,3 @@
-import os
-
 from api import PetFriends
 from settings import valid_email, valid_password
 
@@ -7,8 +5,7 @@ pf = PetFriends()
 
 
 def test_update_pet_with_negative_age(age='-1'):
-    """1. Проверяем возможность добавления отрицательного числа в возраст.
-    Данная возможность должна отстутствовать и вызывать ошибку."""
+    """1. Проверяем возможность добавления отрицательного числа в возраст."""
 
     # Получаем API ключ и сохраняем его в переменную auth_key.
     _, auth_key = pf.get_api_key(valid_email, valid_password)
@@ -106,7 +103,7 @@ def test_get_api_key_for_invalid_user(email="invalid@gmail.com", password="inval
     # Отправляем запрос и сохраняем полученные код статуса в status, а текст ответа в result.
     status, result =  pf.get_api_key(email, password)
 
-    # Проверяем, что запрос не выполнен.
+    # Проверяем, что запрос не выполнен. Иначе вызываем ошибку.
     if status == 200:
         raise AssertionError(
             f'Ошибка! API сервера принял неправильный email или пароль.')
@@ -122,7 +119,7 @@ def test_get_all_pets_with_invalid_key(filter=''):
     # Используя ключ, запрашиваем список всех питомцев.
     status, result = pf.get_list_of_pets(auth_key, filter)
 
-    # Проверяем, что запрос не выполнен.
+    # Проверяем, что запрос не выполнен. Иначе вызываем ошибку.
     if status == 200:
         raise AssertionError(
             f'Ошибка! Сервер принял неправильный API-ключ.')
@@ -139,7 +136,7 @@ def test_get_list_of_pets_with_invalid_filter(filter='my_friends_pets'):
     # Используя ключ запрашиваем список всех питомцев.
     status, result = pf.get_list_of_pets(auth_key, filter)
 
-    # Проверяем, что запрос не выполнен.
+    # Проверяем, что запрос не выполнен. Иначе вызываем ошибку.
     if status == 200:
         raise AssertionError(
             f'Ошибка! Сервер принял не верный фильтр. filter: {filter}.')
@@ -176,37 +173,6 @@ def test_update_my_pet_info_with_empty_param(name='', animal_type='', age=''):
     else:
         # Если список питомцев пуст, вызываем исключение с текстом о пустом списке.
         raise AssertionError('There is no my pets to update.')
-
-    def test_update_my_pet_info_with_empty_param(name='', animal_type='', age=''):
-        """9. Проверяем возможность изменения имени, типа и возраста питомца на пустые."""
-
-        # Получаем API ключ и сохраняем его в переменную auth_key.
-        _, auth_key = pf.get_api_key(valid_email, valid_password)
-
-        # Получаем список своих питомцев.
-        _, my_pets = pf.get_list_of_pets(auth_key, filter='my_pets')
-
-        # Если список не пустой, то пробуем обновить имя, тип и возраст питомца.
-        if len(my_pets['pets']) > 0:
-            status, result = pf.update_pet_info(auth_key, my_pets['pets'][0]['id'], name, animal_type, age)
-            # Записываем в переменные первоначальные значения
-            # имени, типа животного и возраст для последующего сравнения.
-            old_name = result['name']
-            old_animal_type = result['animal_type']
-            old_age = result['age']
-            # Проверяем, устанавливается ли пустые значения для имени, типа животного и возраста.
-            # Если устанавливается, то вызывается ошибка.
-            if result['name'] == name or result['animal_type'] == animal_type or result['age'] == age:
-                raise AssertionError(
-                    f'Ошибка! Добавленно пустое значение. name: {name}, animal_type: {animal_type}, age: {age}.')
-            else:
-                # Иначе значения имени, типа животного и возраста не меняются.
-                assert result['name'] == old_name
-                assert result['animal_type'] == old_animal_type
-                assert result['age'] == old_age
-        else:
-            # Если список питомцев пуст, вызываем исключение с текстом о пустом списке.
-            raise AssertionError('There is no my pets to update.')
 
 def test_update_any_pet_info(name='Ваше животное', animal_type='изменено другим', age='¯\_(ツ)_/¯'):
     """10. Проверяем возможность изменения имени, типа и возраста любого питомца на сайте.
